@@ -7,7 +7,7 @@ import os
 os.makedirs("results", exist_ok=True)
 
 # load image
-img_path = "images/jeniffer.jpg"
+img_path = "images/taylor.jpg"
 img = cv2.imread(img_path)
 if img is None:
     raise FileNotFoundError(f"Image not found at {img_path}")
