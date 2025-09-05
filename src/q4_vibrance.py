@@ -14,34 +14,34 @@ hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 h, s, v = cv2.split(hsv)
 
 sigma = 70.0
-a = 0.6 
+a = 0.6
 
-def vibrance_transform(s_channel, a, sigma=70.0):
-    x = s_channel.astype(np.float32)
-    bump = a * 128.0 * np.exp(-((x - 128.0)**2) / (2 * sigma**2))
-    out = np.clip(x + bump, 0, 255)
-    return out.astype(np.uint8)
+def vibrance_curve_gaussian(a=0.6, sigma=70.0):
+    x = np.arange(256, dtype=np.float32)
+    bump = a * 128.0 * np.exp(-((x - 128.0) ** 2) / (2.0 * sigma ** 2))
+    y = np.minimum(x + bump, 255.0)
+    return y.astype(np.uint8)
 
-s_enhanced = vibrance_transform(s, a, sigma)
+# Build LUT and apply it to the S channel
+lut = vibrance_curve_gaussian(a=a, sigma=sigma)
+s_enhanced = cv2.LUT(s, lut)
 
-# recombine and convert back to BGR
+# Recombine and convert back to BGR
 hsv_enhanced = cv2.merge([h, s_enhanced, v])
 img_enhanced = cv2.cvtColor(hsv_enhanced, cv2.COLOR_HSV2BGR)
 
 cv2.imwrite("results/q4_original.png", img)
 cv2.imwrite("results/q4_vibrance.png", img_enhanced)
 
-# plot transformation curve
-x_vals = np.arange(256)
-bump_curve = a * 128.0 * np.exp(-((x_vals - 128.0)**2) / (2 * sigma**2))
-y_vals = np.clip(x_vals + bump_curve, 0, 255)
-
+# Plot transformation curve (the LUT)
 plt.figure()
-plt.plot(x_vals, y_vals, label=f"a={a}, sigma={sigma}")
+plt.plot(np.arange(256), lut, label=f"a={a}, sigma={sigma}")
 plt.title("Vibrance Transformation Curve")
 plt.xlabel("Input Saturation (x)")
 plt.ylabel("Output Saturation f(x)")
+plt.ylim(0, 255)
 plt.legend()
+plt.grid(True)
 plt.savefig("results/q4_transform_curve.png")
 
 print(f"✅ Q4 done. Vibrance enhanced with a={a}. Check 'results' folder.")
