@@ -1,13 +1,10 @@
-# Q9 — Rice grain counting
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-# ensure results folder exists
 os.makedirs("results", exist_ok=True)
 
-# Load rice image (place rice.png in images/)
 img = cv2.imread("images/rice.png", cv2.IMREAD_GRAYSCALE)
 if img is None:
     raise FileNotFoundError("Image not found: images/rice.png")
@@ -56,7 +53,6 @@ def fill_holes(bin255):
 
 mask_filled = fill_holes(mask)
 
-# (optional) watershed split of touching grains
 bin8 = (mask_filled > 0).astype(np.uint8)
 dist = cv2.distanceTransform(bin8, cv2.DIST_L2, 5)
 markers = (dist > 0.45 * dist.max()).astype(np.uint8)
@@ -71,14 +67,12 @@ seg = (ws > 1).astype(np.uint8) * 255
 n_final, _ = cv2.connectedComponents((seg > 0).astype(np.uint8))
 count = n_final - 1
 
-# Save outputs
 cv2.imwrite("results/q9_denoised.png", g_d)
 cv2.imwrite("results/q9_background.png", bg)
 cv2.imwrite("results/q9_flattened.png", flat)
 cv2.imwrite("results/q9_mask_filled.png", mask_filled)
 cv2.imwrite("results/q9_final.png", seg)
 
-# comparison figure
 fig, axes = plt.subplots(2, 3, figsize=(12, 8))
 axes[0,0].imshow(img, cmap="gray"); axes[0,0].set_title("Original")
 axes[0,1].imshow(g_d, cmap="gray"); axes[0,1].set_title("Denoised")

@@ -3,12 +3,9 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-# ensure results folder exists
 os.makedirs("results", exist_ok=True)
 
-# ==================================================
 # Zoom function
-# ==================================================
 def zoom(img, s, method="nearest"):
     h, w = img.shape[:2]
     new_h, new_w = int(h * s), int(w * s)
@@ -34,12 +31,12 @@ def zoom(img, s, method="nearest"):
                 dx = src_x - x0
                 dy = src_y - y0
 
-                if img.ndim == 2:  # grayscale
+                if img.ndim == 2:  
                     val = (img[y0, x0] * (1 - dx) * (1 - dy) +
                            img[y0, x1] * dx * (1 - dy) +
                            img[y1, x0] * (1 - dx) * dy +
                            img[y1, x1] * dx * dy)
-                else:  # color
+                else: 
                     val = (img[y0, x0, :] * (1 - dx) * (1 - dy) +
                            img[y0, x1, :] * dx * (1 - dy) +
                            img[y1, x0, :] * (1 - dx) * dy +
@@ -48,9 +45,7 @@ def zoom(img, s, method="nearest"):
 
     return out.astype(img.dtype)
 
-# ==================================================
 # Normalized SSD
-# ==================================================
 def normalized_ssd(img1, img2):
     img1 = img1.astype(np.float32)
     img2 = img2.astype(np.float32)
@@ -58,9 +53,7 @@ def normalized_ssd(img1, img2):
     norm_ssd = ssd / img1.size
     return norm_ssd
 
-# ==================================================
 # Process image pairs
-# ==================================================
 pairs = [
     ("images/im01.png", "images/im01small.png"),
     ("images/im02.png", "images/im02small.png")
@@ -78,11 +71,9 @@ for i, (large_path, small_path) in enumerate(pairs, start=1):
     zoom_nearest = zoom(small, scale, method="nearest")
     zoom_bilinear = zoom(small, scale, method="bilinear")
 
-    # save results
     cv2.imwrite(f"results/q7_pair{i}_nearest.png", zoom_nearest)
     cv2.imwrite(f"results/q7_pair{i}_bilinear.png", zoom_bilinear)
 
-    # SSD
     ssd_nearest = normalized_ssd(zoom_nearest, large)
     ssd_bilinear = normalized_ssd(zoom_bilinear, large)
 
@@ -90,7 +81,6 @@ for i, (large_path, small_path) in enumerate(pairs, start=1):
     print(f"Normalized SSD (nearest): {ssd_nearest:.4f}")
     print(f"Normalized SSD (bilinear): {ssd_bilinear:.4f}")
 
-    # save comparison figure
     fig, axes = plt.subplots(1, 3, figsize=(15, 6))
     axes[0].imshow(cv2.cvtColor(large, cv2.COLOR_BGR2RGB)); axes[0].set_title("Original Large")
     axes[1].imshow(cv2.cvtColor(zoom_nearest, cv2.COLOR_BGR2RGB)); axes[1].set_title("Nearest x4")

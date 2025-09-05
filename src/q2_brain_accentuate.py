@@ -3,18 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-# ensure results folder exists
 os.makedirs("results", exist_ok=True)
 
-# load image (grayscale)
 img_path = "images/brain_proton_density_slice.png"
 img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 if img is None:
     raise FileNotFoundError(f"Image not found at {img_path}")
 
-# ----------------------------
 # Step 1: plot histogram
-# ----------------------------
 plt.figure()
 plt.hist(img.ravel(), bins=256, color='black')
 plt.title("Brain image histogram")
@@ -22,9 +18,7 @@ plt.xlabel("Intensity")
 plt.ylabel("Frequency")
 plt.savefig("results/q2_hist.png")
 
-# ----------------------------
 # Step 2: create LUT functions
-# ----------------------------
 def make_piecewise(points):
     """points = [(x_in, x_out), ...]"""
     xs, ys = zip(*points)
@@ -41,9 +35,7 @@ points_gray = [(0,0), (60,60), (120,200), (160,220), (255,255)]
 lut_gray = make_piecewise(points_gray)
 out_gray = cv2.LUT(img, lut_gray)
 
-# ----------------------------
 # Step 3: save outputs
-# ----------------------------
 cv2.imwrite("results/q2_white.png", out_white)
 cv2.imwrite("results/q2_gray.png", out_gray)
 
